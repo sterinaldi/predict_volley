@@ -1,0 +1,47 @@
+[build-system]
+requires = [
+    "oldest-supported-numpy",
+    "setuptools>=42",
+    "wheel",
+    "build",
+    ]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ['predict_volley']
+
+[project]
+name = 'predict_volley'
+description = 'Framework to predict the results of a volleyball tournament'
+version = '0.0.1'
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {file = "LICENSE"}
+authors = [
+  {name = "Stefano Rinaldi", email = "stefano.rinaldi@uni-heidelberg.de"},
+  ]
+
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.6",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib != 3.6.3",
+    "corner",
+    "tqdm",
+    ]
+
+[project.urls]
+Repository = "https://github.com/sterinaldi/predict_volley.git"
+Issues = "https://github.com/sterinaldi/predict_volley/issues"
