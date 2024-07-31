@@ -128,7 +128,7 @@ class Knockout:
         self.reset()
     
     def update_matches(self):
-        self.matches = [Match(self.active_teams[i], self.active_teams[len(self.active_teams)-i-1]) for i in range(len(self.active_teams)//2)]
+        self.matches = [Match(self.active_teams[i], self.active_teams[len(self.active_teams)-(i+1)]) for i in range(len(self.active_teams)//2)]
     
     def reset(self):
         for team in self.teams:
@@ -141,10 +141,13 @@ class Knockout:
         self.update_matches()
     
     def play(self):
-        while len(self.matches) > 2:
+        while True:
             self.advance()
-            self.active_teams = [match.winner for match in self.matches]
-            self.update_matches()
+            if len(self.matches) > 2:
+                self.active_teams = [match.winner for match in self.matches]
+                self.update_matches()
+            else:
+                break
         # Semi-finals
         self.advance()
         # Finals
@@ -160,8 +163,9 @@ class Knockout:
     def advance(self):
         for match in self.matches:
             match.play()
-        Standings(self, pool = False, remaining = len(self.active_teams))
-        
+        losers_pool = Pool([match.loser for match in self.matches])
+        losers_pool.active_teams = losers_pool.teams
+        Standings(losers_pool, pool = False, remaining = len(self.active_teams)//2)
 
 class Tournament:
     """
@@ -183,16 +187,15 @@ class Tournament:
         if self.olympics:
             for i in range(len(self.pools['A'].teams)):
                 temp_pool = Pool([team for team in self.teams if team.pool_standing == i+1], reset = False)
+                temp_pool.active_teams = temp_pool.teams
                 Standings(temp_pool, pool = False, remaining = i*len(self.pools.keys()))
         else:
+            self.active_teams = self.teams
             Standings(self, pool = False)
         rr            = [team.tournament_standing for team in self.teams]
-        print(rr)
-        print(np.argsort(rr)[::-1])
         idx           = np.argsort(rr)[::-1]
-        print(self.teams)
         self.teams    = self.teams[idx]
-        self.knockout = Knockout(self.teams[:8])
+        self.knockout = Knockout(self.teams[-8:])
     
     def play(self):
         for pool in self.pools.keys():

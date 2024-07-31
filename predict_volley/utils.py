@@ -14,16 +14,19 @@ def ProbabilityResult(r1, r2):
     return p/np.sum(p)
 
 def Standings(tournament, pool = True, remaining = 0):
-    won    = np.array([team.won for team in tournament.teams])
-    points = np.array([team.points for team in tournament.teams])
+    if pool:
+        teams = tournament.teams
+    else:
+        teams = tournament.active_teams
+    won    = np.array([team.won for team in teams])
+    points = np.array([team.points for team in teams])
     with np.errstate(divide = 'ignore'):
-        q_set = np.array([team.sets_won/team.sets_lost if team.sets_lost > 0 else np.inf for team in tournament.teams])
+        q_set = np.array([team.sets_won/team.sets_lost if team.sets_lost > 0 else np.inf for team in teams])
     dt = np.dtype([('won', np.float64), ('points', np.float64), ('q_set', np.float64)])
     v  = np.array([(wi, pi, qi) for wi, pi, qi in zip(won, points, q_set)], dtype = dt)
-    stand = np.abs(np.argsort(v, order = ['won', 'points', 'q_set']) - 4)
-    for team, s in zip(tournament.teams, stand):
+    stand = np.abs(np.argsort(v, order = ['won', 'points', 'q_set']) - len(teams))
+    for team, s in zip(teams, stand):
         if pool:
             team.pool_standing = s
         else:
-            print(s)
             team.tournament_standing = s + remaining
