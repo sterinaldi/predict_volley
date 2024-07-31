@@ -28,4 +28,4 @@ To try it, simply move to that folder and run
 ```bash
 cd Paris2024
 python Paris2024.py
-``
+```
