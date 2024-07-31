@@ -214,7 +214,7 @@ class Tournament:
         self.create_knockout()
         self.knockout.play()
     
-    def predict(self, n_draws = 1000):
+    def predict(self, n_draws = 10000):
         for team in self.teams:
             team.tournament_result = []
             team.pool_result       = []
