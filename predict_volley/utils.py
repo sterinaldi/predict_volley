@@ -27,9 +27,9 @@ def Standings(tournament, pool = True, remaining = 0):
     points = np.array([team.points for team in teams])
     with np.errstate(divide = 'ignore'):
         q_set = np.array([team.sets_won/team.sets_lost if team.sets_lost > 0 else np.inf for team in teams])
-    dt = np.dtype([('won', np.float64), ('points', np.float64), ('q_set', np.float64)])
+    dt = np.dtype([('won', float), ('points', float), ('q_set', float)])
     v  = np.array([(wi, pi, qi) for wi, pi, qi in zip(won, points, q_set)], dtype = dt)
-    stand = np.abs(np.argsort(v, order = ['won', 'points', 'q_set']) - len(teams))
+    stand = np.abs(np.argsort(np.argsort(v, order = ['won', 'points', 'q_set'])) - len(teams))
     for team, s in zip(teams, stand):
         if pool:
             team.pool_standing = s

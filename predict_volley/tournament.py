@@ -17,7 +17,7 @@ class Match:
     def __init__(self, team1, team2):
         self.team1  = team1
         self.team2  = team2
-        self.labels = ['-'.join((self.team1.label, self.team2.label)), '-'.join((self.team2.label, self.team2.label))]
+        self.labels = ['-'.join((self.team1.label, self.team2.label)), '-'.join((self.team2.label, self.team1.label))]
         self.played  = False
         
     def play(self):
@@ -93,20 +93,23 @@ class Pool:
             team.sets_lost     = team.played_sets_lost
             team.pool_standing = None
 
-    def set_results(self, results):
+    def set_results(self, *results):
         for result in results:
             for match in self.matches:
                 if result[0] in match.labels:
+                    if result[0] == match.labels[1]:
+                        result[1] = result[1][::-1]
                     match.played = True
                     match.result(result[1])
 
     def play(self):
+        self.reset()
         for match in self.matches:
             if not match.played:
                 match.play()
         Standings(self)
 
-    def predict(self, n_draws = 1000):
+    def predict(self, n_draws = 10000):
         for team in self.teams:
             team.pool_result = []
         for _ in tqdm(range(int(n_draws)), desc = self.name):
