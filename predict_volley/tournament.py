@@ -1,6 +1,7 @@
 import numpy as np
 from itertools import combinations
 from string import ascii_uppercase
+from tqdm import tqdm
 from predict_volley.utils import ProbabilityResult, Standings
 
 possible_results = ['3-0', '3-1', '3-2', '2-3', '1-3', '0-3']
@@ -74,15 +75,15 @@ class Pool:
     Arguments:
         list teams: participating teams
     """
-    def __init__(self, teams, pool_name = None, reset = True):
-        self.teams   = teams
+    def __init__(self, teams, name = None, reset = True):
+        self.teams   = np.array(teams)
         self.matches = [Match(t1, t2) for (t1, t2) in combinations(self.teams, 2)]
         if reset:
             self.reset()
-        if pool_name is not None:
-            self.pool_name = pool_name
+        if name is not None:
+            self.name = name
         else:
-            self.pool_name = 'Pool'
+            self.name = 'Pool'
 
     def reset(self):
         for team in self.teams:
@@ -108,7 +109,7 @@ class Pool:
     def predict(self, n_draws = 1000):
         for team in self.teams:
             team.pool_result = []
-        for _ in range(int(n_draws)):
+        for _ in tqdm(range(int(n_draws)), desc = self.name):
             self.play()
             for team in self.teams:
                 team.pool_result.append(team.pool_standing)
@@ -174,14 +175,18 @@ class Tournament:
     Arguments:
         list of lists of Teams: pools
     """
-    def __init__(self, pools, olympics = False):
+    def __init__(self, pools, name = None, olympics = False):
         self.teams = np.array([team for pool in pools for team in pool])
         self.pools = {s: Pool(pool, f'Pool {s}') for pool, s in zip(pools, ascii_uppercase[:len(pools)])}
         self.olympics = olympics
+        if name is None:
+            self.name = 'Tournament'
+        else:
+            self.name = name
 
     def reset(self):
-        for pool in pools:
-            pool.reset()
+        for pool in self.pools.keys():
+            self.pools[pool].reset()
     
     def create_knockout(self):
         if self.olympics:
@@ -197,17 +202,21 @@ class Tournament:
         self.teams    = self.teams[idx]
         self.knockout = Knockout(self.teams[-8:])
     
-    def play(self):
+    def play(self, predict = False):
         for pool in self.pools.keys():
             self.pools[pool].play()
+        if predict:
+            for team in self.teams:
+                team.pool_result.append(team.pool_standing)
         self.create_knockout()
         self.knockout.play()
     
     def predict(self, n_draws = 1000):
         for team in self.teams:
             team.tournament_result = []
-        for _ in range(int(n_draws)):
-            self.play()
+            team.pool_result       = []
+        for _ in tqdm(range(int(n_draws)), desc = self.name):
+            self.play(predict = True)
             for team in self.teams:
-                team.pool_result.append(team.tournament_standing)
+                team.tournament_result.append(team.tournament_standing)
             self.reset()
