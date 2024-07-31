@@ -21,7 +21,13 @@ pools = [[team1, team2, team3, team4],
 world_cup = Tournament(pools, name = 'World Cup', olympics = False)
 ```
 
-the `olympics` keyword argument controls the way in which the knockout stage is built, either using the aggregated ranking (`olympics = False`) or using the [Paris 2024 formula](https://en.volleyballworld.com/volleyball/competitions/volleyball-olympic-games-paris-2024/competition/formula) (`olympics = True`).
+The `olympics` keyword argument controls the way in which the knockout stage is built, either using the aggregated ranking (`olympics = False`) or using the [Paris 2024 formula](https://en.volleyballworld.com/volleyball/competitions/volleyball-olympic-games-paris-2024/competition/formula) (`olympics = True`).
+The predicted results can be displayed using the `predict_volley.utils.PlotResults` method:
+
+```python
+from predict_volley.utils import PlotResults
+PlotResults(world_cup)
+```
 
 A working example can be found in the [Paris2024 folder](https://github.com/sterinaldi/predict_volley/tree/main/Paris2024), where you can find the Paris 2024 Olympic Tournament already set up, with the results updated with all the matches played up to July 31, 15:00 CEST.
 To try it, simply move to that folder and run
